@@ -7,6 +7,9 @@ API_SECRET="your_api_secret_here"
 # Your domain name like "sample.com", without "www" or/and "http://"
 DOMAIN="your_domain_here"
 
+# Strip only the top domain to get the zone id
+# DOMAIN=$(expr match "$CERTBOT_DOMAIN" '.*\.\(.*\..*\)')
+
 LOG_DIR="/tmp"
 LOG_FILE="$LOG_DIR/cleanup.log"
 
