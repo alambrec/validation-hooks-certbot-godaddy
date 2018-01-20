@@ -1,36 +1,76 @@
 #!/bin/bash
 
+LOG_DIR="/tmp"
+LOG_FILE="$LOG_DIR/authenticator.$CERTBOT_DOMAIN.log"
+
+echo "" > $LOG_FILE
+
+function log {
+  DATE=$(date)
+  echo "$DATE: $1" >> $LOG_FILE
+}
+
+log "[BEGIN]"
+
 # Get your API key from https://developer.godaddy.com
 API_KEY="your_api_key_here"
 API_SECRET="your_api_secret_here"
 
-# Your domain name like "sample.com", without "www" or/and "http://"
-DOMAIN="your_domain_here"
+# Init variables
+DOMAIN=""
+SUBDOMAIN=""
 
-# Strip only the top domain to get the zone id
-# DOMAIN=$(expr match "$CERTBOT_DOMAIN" '.*\.\(.*\..*\)')
+# Detection of root domain or subdomain
+if [ "$(uname -s)" == "Darwin" ]
+then
+  DOMAIN=$(expr "$CERTBOT_DOMAIN" : '.*\.\(.*\..*\)')
+  if [[ ! -z "${DOMAIN// }" ]]
+  then
+    log "SUBDOMAIN DETECTED"
+    SUBDOMAIN=$(echo "$CERTBOT_DOMAIN" | awk -F"." '{print $1}')
+  else
+    DOMAIN=$CERTBOT_DOMAIN
+  fi
+else
+  DOMAIN=$(expr match "$CERTBOT_DOMAIN" '.*\.\(.*\..*\)')
+  if [[ ! -z "${DOMAIN// }" ]]
+  then
+    log "SUBDOMAIN DETECTED"
+    SUBDOMAIN=$(echo "$CERTBOT_DOMAIN" | awk -F"." '{print $1}')
+  else
+    DOMAIN=$CERTBOT_DOMAIN
+  fi
+fi
 
-LOG_DIR="/tmp"
-LOG_FILE="$LOG_DIR/authenticator.log"
+log "DOMAIN $DOMAIN"
+log "SUBDOMAIN $SUBDOMAIN"
 
 # Update TXT record
 RECORD_TYPE="TXT"
-RECORD_NAME="_acme-challenge"
+
+if [[ ! -z "${SUBDOMAIN// }" ]]
+then
+  RECORD_NAME="_acme-challenge.$SUBDOMAIN"
+else
+  RECORD_NAME="_acme-challenge"
+fi
+
+log "RECORD_NAME $RECORD_NAME"
+
 # Uncomment this line only to test this script manually
 #CERTBOT_VALIDATION="test_value"
 DEFAULT_CERTBOT_VALIDATION="default_value"
 
-echo "[BEGIN]" > $LOG_FILE
-echo "CERTBOT VALIDATION $CERTBOT_VALIDATION" >> $LOG_FILE
-echo "CERTBOT DOMAIN $CERTBOT_DOMAIN" >> $LOG_FILE
+log "CERTBOT VALIDATION $CERTBOT_VALIDATION"
+log "CERTBOT DOMAIN $CERTBOT_DOMAIN"
 
 if [ -z $CERTBOT_VALIDATION ]
 then
-  echo "CERTBOT_VALIDATION is unset" >> $LOG_FILE
+  log "CERTBOT_VALIDATION is unset"
   eval CERTBOT_VALIDATION=$DEFAULT_CERTBOT_VALIDATION
-  echo "CERTBOT_VALIDATION has been set to $CERTBOT_VALIDATION" >> $LOG_FILE
+  log "CERTBOT_VALIDATION has been set to $CERTBOT_VALIDATION"
 else
-  echo "CERTBOT_VALIDATION is set to '$CERTBOT_VALIDATION'" >> $LOG_FILE
+  log "CERTBOT_VALIDATION is set to '$CERTBOT_VALIDATION'"
 fi
 
 
@@ -43,18 +83,24 @@ JSON_RESPONSE=$(curl -s -X PUT \
 
 if [ $JSON_RESPONSE == "{}" ]
 then
-  echo "OK" >> $LOG_FILE
-  sleep 25
-  TOKEN_FOUND=$(host -t txt _acme-challenge.lambrecht.house | grep $CERTBOT_VALIDATION)
-  if [ $? -eq 0 ]
-  then
-    echo "TOKEN FOUND" >> $LOG_FILE
-  else
-    echo "TOKEN NOT FOUND" >> $LOG_FILE
-  fi
+  log "OK"
+  I=0
+  while [ $I -le 5 ]
+  do
+    sleep 4
+    R=$(host -t txt "$RECORD_NAME.$DOMAIN" | grep $CERTBOT_VALIDATION)
+    if [ $? -eq 0 ]
+    then
+      log "TEST $I > TOKEN FOUND"
+      break
+    else
+      log "TEST $I > TOKEN NOT FOUND"
+      let I++
+    fi
+  done
 else
-  echo "KO" >> $LOG_FILE
-  echo $JSON_RESPONSE >> $LOG_FILE
+  log "KO"
+  log $JSON_RESPONSE
 fi
 
-echo "[END]" >> $LOG_FILE
+log "[END]"

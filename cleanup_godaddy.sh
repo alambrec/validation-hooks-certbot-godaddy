@@ -1,24 +1,62 @@
 #!/bin/bash
 
+LOG_DIR="/tmp"
+LOG_FILE="$LOG_DIR/cleanup.$CERTBOT_DOMAIN.log"
+
+echo "" > $LOG_FILE
+
+function log {
+  DATE=$(date)
+  echo "$DATE: $1" >> $LOG_FILE
+}
+
+log "[BEGIN]"
+
 # Get your API key from https://developer.godaddy.com
 API_KEY="your_api_key_here"
 API_SECRET="your_api_secret_here"
 
-# Your domain name like "sample.com", without "www" or/and "http://"
-DOMAIN="your_domain_here"
+# Init variables
+DOMAIN=""
+SUBDOMAIN=""
 
-# Strip only the top domain to get the zone id
-# DOMAIN=$(expr match "$CERTBOT_DOMAIN" '.*\.\(.*\..*\)')
+# Detection of root domain or subdomain
+if [ "$(uname -s)" == "Darwin" ]
+then
+  DOMAIN=$(expr "$CERTBOT_DOMAIN" : '.*\.\(.*\..*\)')
+  if [[ ! -z "${DOMAIN// }" ]]
+  then
+    log "SUBDOMAIN DETECTED"
+    SUBDOMAIN=$(echo "$CERTBOT_DOMAIN" | awk -F"." '{print $1}')
+  else
+    DOMAIN=$CERTBOT_DOMAIN
+  fi
+else
+  DOMAIN=$(expr match "$CERTBOT_DOMAIN" '.*\.\(.*\..*\)')
+  if [[ ! -z "${DOMAIN// }" ]]
+  then
+    log "SUBDOMAIN DETECTED"
+    SUBDOMAIN=$(echo "$CERTBOT_DOMAIN" | awk -F"." '{print $1}')
+  else
+    DOMAIN=$CERTBOT_DOMAIN
+  fi
+fi
 
-LOG_DIR="/tmp"
-LOG_FILE="$LOG_DIR/cleanup.log"
+log "DOMAIN $DOMAIN"
+log "SUBDOMAIN $SUBDOMAIN"
 
 # Update TXT record
 RECORD_TYPE="TXT"
-RECORD_NAME="_acme-challenge"
 RECORD_VALUE="none"
 
-echo "[BEGIN]" > $LOG_FILE
+if [[ ! -z "${SUBDOMAIN// }" ]]
+then
+  RECORD_NAME="_acme-challenge.$SUBDOMAIN"
+else
+  RECORD_NAME="_acme-challenge"
+fi
+
+log "RECORD_NAME $RECORD_NAME"
 
 # Update the previous record to default value
 JSON_RESPONSE=$(curl -s -X PUT \
@@ -29,10 +67,10 @@ JSON_RESPONSE=$(curl -s -X PUT \
 
 if [ $JSON_RESPONSE == "{}" ]
 then
-  echo "OK" >> $LOG_FILE
+  log "OK"
 else
-  echo "KO" >> $LOG_FILE
-  echo $JSON_RESPONSE >> $LOG_FILE
+  log "KO"
+  log $JSON_RESPONSE
 fi
 
-echo "[END]" >> $LOG_FILE
+log "[END]"
