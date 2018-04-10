@@ -88,7 +88,7 @@ then
   while [ $I -le 5 ]
   do
     sleep 4
-    R=$(host -t txt "$RECORD_NAME.$DOMAIN" | grep $CERTBOT_VALIDATION)
+    R=$(host -t txt "$RECORD_NAME.$DOMAIN" | grep -e "$CERTBOT_VALIDATION")
     if [ $? -eq 0 ]
     then
       log "TEST $I > TOKEN FOUND"
