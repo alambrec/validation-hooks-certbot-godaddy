@@ -81,7 +81,7 @@ JSON_RESPONSE=$(curl -s -X PUT \
 -d "[{\"data\": \"$CERTBOT_VALIDATION\", \"ttl\": 600}]" \
 "https://api.godaddy.com/v1/domains/$DOMAIN/records/$RECORD_TYPE/$RECORD_NAME")
 
-if [ $JSON_RESPONSE == "{}" ]
+if [ "$JSON_RESPONSE" == "{}" ]
 then
   log "OK"
   I=0
