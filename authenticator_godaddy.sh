@@ -75,13 +75,13 @@ fi
 
 
 # Update the previous record
-JSON_RESPONSE=$(curl -s -X PUT \
+RESPONSE_CODE=$(curl -s -X PUT -w %{http_code} \
 -H "Authorization: sso-key $API_KEY:$API_SECRET" \
 -H "Content-Type: application/json" \
 -d "[{\"data\": \"$CERTBOT_VALIDATION\", \"ttl\": 600}]" \
 "https://api.godaddy.com/v1/domains/$DOMAIN/records/$RECORD_TYPE/$RECORD_NAME")
 
-if [ "$JSON_RESPONSE" == "{}" ]
+if [ "$RESPONSE_CODE" == "200" ]
 then
   log "OK"
   I=0
@@ -100,7 +100,7 @@ then
   done
 else
   log "KO"
-  log $JSON_RESPONSE
+  log $RESPONSE_CODE
 fi
 
 log "[END]"
