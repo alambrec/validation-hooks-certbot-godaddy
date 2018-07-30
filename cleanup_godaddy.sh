@@ -65,7 +65,7 @@ RESPONSE_CODE=$(curl -s -X PUT -w %{http_code} \
 -d "[{\"data\": \"$RECORD_VALUE\", \"ttl\": 600}]" \
 "https://api.godaddy.com/v1/domains/$DOMAIN/records/$RECORD_TYPE/$RECORD_NAME")
 
-if [ "$RESPONSE_CODE" == "{}" ]
+if [ "$RESPONSE_CODE" == "200" ]
 then
   log "OK"
 else
