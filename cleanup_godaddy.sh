@@ -59,18 +59,18 @@ fi
 log "RECORD_NAME $RECORD_NAME"
 
 # Update the previous record to default value
-JSON_RESPONSE=$(curl -s -X PUT \
+RESPONSE_CODE=$(curl -s -X PUT -w %{http_code} \
 -H "Authorization: sso-key $API_KEY:$API_SECRET" \
 -H "Content-Type: application/json" \
 -d "[{\"data\": \"$RECORD_VALUE\", \"ttl\": 600}]" \
 "https://api.godaddy.com/v1/domains/$DOMAIN/records/$RECORD_TYPE/$RECORD_NAME")
 
-if [ "$JSON_RESPONSE" == "{}" ]
+if [ "$RESPONSE_CODE" == "{}" ]
 then
   log "OK"
 else
   log "KO"
-  log $JSON_RESPONSE
+  log $RESPONSE_CODE
 fi
 
 log "[END]"
