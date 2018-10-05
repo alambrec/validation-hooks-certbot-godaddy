@@ -36,7 +36,8 @@ else
   if [[ ! -z "${DOMAIN// }" ]]
   then
     log "SUBDOMAIN DETECTED"
-    SUBDOMAIN=$(echo "$CERTBOT_DOMAIN" | awk -F"." '{print $1}')
+    SUBDOMAIN=$(echo "$CERTBOT_DOMAIN" | sed "s/.$DOMAIN//")
+    DOMAIN=$CERTBOT_DOMAIN
   else
     DOMAIN=$CERTBOT_DOMAIN
   fi
