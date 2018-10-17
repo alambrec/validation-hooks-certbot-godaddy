@@ -12,6 +12,10 @@ function log {
 
 log "[BEGIN]"
 
+# Uncomment this lines only to test this script manually
+#CERTBOT_DOMAIN="test_domain"
+#CERTBOT_VALIDATION="test_value"
+
 # Get your API key from https://developer.godaddy.com
 API_KEY="your_api_key_here"
 API_SECRET="your_api_secret_here"
@@ -58,8 +62,6 @@ fi
 
 log "RECORD_NAME $RECORD_NAME"
 
-# Uncomment this line only to test this script manually
-#CERTBOT_VALIDATION="test_value"
 DEFAULT_CERTBOT_VALIDATION="default_value"
 
 log "CERTBOT VALIDATION $CERTBOT_VALIDATION"
