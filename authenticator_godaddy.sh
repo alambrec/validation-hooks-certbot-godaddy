@@ -1,17 +1,5 @@
 #!/bin/bash
 
-LOG_DIR="/tmp"
-LOG_FILE="$LOG_DIR/authenticator.$CERTBOT_DOMAIN.log"
-
-echo "" > $LOG_FILE
-
-function log {
-  DATE=$(date)
-  echo "$DATE: $1" >> $LOG_FILE
-}
-
-log "[BEGIN]"
-
 # Uncomment this lines only to test this script manually
 #CERTBOT_DOMAIN="test_domain"
 #CERTBOT_VALIDATION="test_value"
@@ -23,6 +11,18 @@ API_SECRET="your_api_secret_here"
 # Init variables
 DOMAIN=""
 SUBDOMAIN=""
+
+LOG_DIR="/tmp"
+LOG_FILE="$LOG_DIR/authenticator.$CERTBOT_DOMAIN.log"
+
+echo "" > $LOG_FILE
+
+function log {
+  DATE=$(date)
+  echo "$DATE: $1" >> $LOG_FILE
+}
+
+log "[BEGIN]"
 
 # Detection of root domain or subdomain
 if [ "$(uname -s)" == "Darwin" ]
