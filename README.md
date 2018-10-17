@@ -36,9 +36,9 @@ Debug
 ----------
 If you have any problems, you can run separately this script.
 
-For `authenticator_godaddy.sh`, you must uncomment the lines 16 and 17 to set manually following variables :
- * `$CERTBOT_DOMAIN`
- * `$CERTBOT_VALIDATION`
+For `authenticator_godaddy.sh`, you must set manually following variables :
+ * `CERTBOT_DOMAIN`
+ * `CERTBOT_VALIDATION`
 
 For example, if your domain is `auth.foo.mydomain.com`, these variables must set like :
 ```
@@ -47,9 +47,9 @@ CERTBOT_DOMAIN="auth.foo.mydomain.com"
 CERTBOT_VALIDATION="test_value"
 ```
 
-One the `authenticator_godaddy.sh` script ended, your domain must be upgrade with `_acme-challenge.auth.foo` TXT record with `test_value` as value.  
+Once the `authenticator_godaddy.sh` script ended, your domain must be upgrade with `_acme-challenge.auth.foo` TXT record with `test_value` as value.  
 
-However, the lines 16 and 17 must be commented in `normal mode` because `#CERTBOT_DOMAIN` and `$CERTBOT_VALIDATION` variables is defined by `certbot` command.
+However, these lines must be commented in `normal mode` because `#CERTBOT_DOMAIN` and `$CERTBOT_VALIDATION` variables is defined by `certbot` command.
 
 Testing systems
 ----------
