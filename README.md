@@ -14,12 +14,14 @@ This script is a shell script based on `/bin/sh`.
 It uses following command tools :
 ```
 curl
-host
+dig
 ```
 
 It depends on several packages :
 ```
 yum install curl
+# dig command depends on bind-utils package
+yum install bind-utils
 ```
 
 How to
@@ -49,11 +51,9 @@ CERTBOT_VALIDATION="test_value"
 
 Once the `authenticator_godaddy.sh` script ended, your domain must be upgrade with `_acme-challenge.auth.foo` TXT record with `test_value` as value.  
 
-However, these lines must be commented in `normal mode` because `#CERTBOT_DOMAIN` and `$CERTBOT_VALIDATION` variables is defined by `certbot` command.
+However, these lines must be commented in `normal mode` because `$CERTBOT_DOMAIN` and `$CERTBOT_VALIDATION` variables is defined by `certbot` command.
 
 Testing systems
 ----------
 - macSierra
-- CentOS 7 
-
-
+- CentOS 7
