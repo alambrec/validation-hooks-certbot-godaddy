@@ -8,6 +8,14 @@
 API_KEY="your_api_key_here"
 API_SECRET="your_api_secret_here"
 
+# DNS entry propagation parameters
+# Delay between the DNS record update and the first dig request (in seconds)
+DELAY_AFTER_DNS_RECORD_UPDATE=30
+# Time interval between each dig request (in seconds)
+DIG_TIME_INTERVAL=4
+# Number of retries of dig request before ending in a failure
+DIG_NB_RETRIES=25
+
 # Init variables
 DOMAIN=""
 SUBDOMAIN=""
@@ -103,11 +111,11 @@ fi
 if [ "$RESPONSE_CODE" == "200" ]
 then
   log "OK"
-  sleep 30
+  sleep $DELAY_AFTER_DNS_RECORD_UPDATE
   I=0
-  while [ $I -le 10 ]
+  while [ $I -le $DIG_NB_RETRIES ]
   do
-    sleep 4
+    sleep $DIG_TIME_INTERVAL
     R=$(dig +short @$NS $RECORD_NAME.$DOMAIN txt | grep -e "$CERTBOT_VALIDATION")
     if [ $? -eq 0 ]
     then
