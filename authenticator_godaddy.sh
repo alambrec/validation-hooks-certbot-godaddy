@@ -1,5 +1,9 @@
 #!/bin/bash
 
+LOG_DIR="/tmp"
+LOG_FILE="$LOG_DIR/authenticator.$CERTBOT_DOMAIN.log"
+SECRET_FILE="/etc/certbot/${CERTBOT_DOMAIN}/secrets"
+
 # Uncomment this lines only to test this script manually
 #CERTBOT_DOMAIN="test_domain"
 #CERTBOT_VALIDATION="test_value"
@@ -7,6 +11,9 @@
 # Get your API key from https://developer.godaddy.com
 API_KEY="your_api_key_here"
 API_SECRET="your_api_secret_here"
+
+# Load secrets from an external file
+[ -f ${SECRET_FILE} ] && . ${SECRET_FILE}
 
 # DNS entry propagation parameters
 # Delay between the DNS record update and the first dig request (in seconds)
@@ -19,9 +26,6 @@ DIG_NB_RETRIES=25
 # Init variables
 DOMAIN=""
 SUBDOMAIN=""
-
-LOG_DIR="/tmp"
-LOG_FILE="$LOG_DIR/authenticator.$CERTBOT_DOMAIN.log"
 
 echo "" > $LOG_FILE
 

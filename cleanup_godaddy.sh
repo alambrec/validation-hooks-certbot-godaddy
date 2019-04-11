@@ -2,6 +2,7 @@
 
 LOG_DIR="/tmp"
 LOG_FILE="$LOG_DIR/cleanup.$CERTBOT_DOMAIN.log"
+SECRET_FILE="/etc/certbot/${CERTBOT_DOMAIN}/secrets"
 
 echo "" > $LOG_FILE
 
@@ -15,6 +16,10 @@ log "[BEGIN]"
 # Get your API key from https://developer.godaddy.com
 API_KEY="your_api_key_here"
 API_SECRET="your_api_secret_here"
+
+# Load secrets from an external file
+[ -f ${SECRET_FILE} ] && . ${SECRET_FILE}
+
 
 # Init variables
 DOMAIN=""
