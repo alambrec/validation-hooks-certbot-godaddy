@@ -1,19 +1,18 @@
 #!/bin/bash
 
+# Uncomment this lines only to test this script manually
+#CERTBOT_DOMAIN="subdomain.domain.xyz"
+#CERTBOT_VALIDATION="test_value"
+
+DEFAULT_CERTBOT_VALIDATION="default_value"
+
 LOG_DIR="/tmp"
 LOG_FILE="$LOG_DIR/authenticator.$CERTBOT_DOMAIN.log"
 SECRET_FILE="/etc/certbot/${CERTBOT_DOMAIN}/secrets"
 
-# Uncomment this lines only to test this script manually
-#CERTBOT_DOMAIN="test_domain"
-#CERTBOT_VALIDATION="test_value"
-
 # Get your API key from https://developer.godaddy.com
 API_KEY="your_api_key_here"
 API_SECRET="your_api_secret_here"
-
-# Load secrets from an external file
-[ -f ${SECRET_FILE} ] && . ${SECRET_FILE}
 
 # DNS entry propagation parameters
 # Delay between the DNS record update and the first dig request (in seconds)
@@ -27,7 +26,11 @@ DIG_NB_RETRIES=25
 DOMAIN=""
 SUBDOMAIN=""
 
-echo "" > $LOG_FILE
+# Create an empty file if it doesn't exist
+if [ -f ${LOG_FILE} ]
+then
+  touch ${LOG_FILE}
+fi
 
 function log {
   DATE=$(date)
@@ -35,6 +38,19 @@ function log {
 }
 
 log "[BEGIN]"
+
+# Log SECRET_FILE path to debug
+#log "SECRET_FILE $SECRET_FILE"
+
+# Load secrets from an external file
+if [ -f ${SECRET_FILE} ]
+then
+  # Identical to "source ${SECRET_FILE}"
+  . ${SECRET_FILE}
+  log "SECRET_FILE FOUND : EXTERNAL API KEY USED"
+else
+  log "SECRET_FILE NOT FOUND : INTERNAL API KEY USED"
+fi
 
 # Detection of root domain or subdomain
 if [ "$(uname -s)" == "Darwin" ]
@@ -68,19 +84,31 @@ RECORD_TYPE="TXT"
 if [[ ! -z "${SUBDOMAIN// }" ]]
 then
   RECORD_NAME="_acme-challenge.$SUBDOMAIN"
-  NS=$(dig +short $SUBDOMAIN.$DOMAIN ns | tail -1)
+  NS=$(dig +short $SUBDOMAIN.$DOMAIN ns)
 else
   RECORD_NAME="_acme-challenge"
-  NS=$(dig +short $DOMAIN ns | tail -1)
+  NS=$(dig +short $DOMAIN ns)
+fi
+
+if [ $? -ne 0 ]
+then
+  log "DIG COMMAND HAS FAILED"
+  log "[END]"
+  exit 1
+elif [ -z "$NS" ]
+then
+  log "NS NOT FOUND"
+  log "[END]"
+  exit 1
+else
+  NS=$(echo "$NS" | tail -1)
+  log "NS ${NS}"
 fi
 
 log "RECORD_NAME $RECORD_NAME"
-log "NS $NS"
 
-DEFAULT_CERTBOT_VALIDATION="default_value"
-
-log "CERTBOT VALIDATION $CERTBOT_VALIDATION"
-log "CERTBOT DOMAIN $CERTBOT_DOMAIN"
+log "CERTBOT_VALIDATION $CERTBOT_VALIDATION"
+log "CERTBOT_DOMAIN $CERTBOT_DOMAIN"
 
 if [ -z $CERTBOT_VALIDATION ]
 then

@@ -1,10 +1,22 @@
 #!/bin/bash
 
+# Uncomment this lines only to test this script manually
+#CERTBOT_DOMAIN="subdomain.domain.xyz"
+#CERTBOT_VALIDATION="test_value"
+
 LOG_DIR="/tmp"
-LOG_FILE="$LOG_DIR/cleanup.$CERTBOT_DOMAIN.log"
+LOG_FILE="$LOG_DIR/cleanup.${CERTBOT_DOMAIN}.log"
 SECRET_FILE="/etc/certbot/${CERTBOT_DOMAIN}/secrets"
 
-echo "" > $LOG_FILE
+# Get your API key from https://developer.godaddy.com
+API_KEY="your_api_key_here"
+API_SECRET="your_api_secret_here"
+
+# Create an empty file if it doesn't exist
+if [ -f ${LOG_FILE} ]
+then
+  touch ${LOG_FILE}
+fi
 
 function log {
   DATE=$(date)
@@ -13,12 +25,18 @@ function log {
 
 log "[BEGIN]"
 
-# Get your API key from https://developer.godaddy.com
-API_KEY="your_api_key_here"
-API_SECRET="your_api_secret_here"
+# Log SECRET_FILE path to debug
+#log "SECRET_FILE $SECRET_FILE"
 
 # Load secrets from an external file
-[ -f ${SECRET_FILE} ] && . ${SECRET_FILE}
+if [ -f ${SECRET_FILE} ]
+then
+  # Identical to "source ${SECRET_FILE}"
+  . ${SECRET_FILE}
+  log "SECRET_FILE FOUND : EXTERNAL API KEY USED"
+else
+  log "SECRET_FILE NOT FOUND : INTERNAL API KEY USED"
+fi
 
 
 # Init variables
