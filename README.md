@@ -10,7 +10,7 @@ More informations are available on [Certbot Doc](https://certbot.eff.org/docs/us
 
 Required package
 ----------
-This script is a shell script based on `/bin/sh`.
+This script is a shell script based on `/bin/bash`.
 It uses following command tools :
 ```
 curl
@@ -34,6 +34,7 @@ certbot certonly --manual --preferred-challenges=dns --manual-auth-hook ./authen
 ```
 4. If `certbot` return success, you would get your new certificate on your system
 
+
 Debug
 ----------
 If you have any problems, you can run separately this script.
@@ -52,6 +53,16 @@ CERTBOT_VALIDATION="test_value"
 Once the `authenticator_godaddy.sh` script ended, your domain must be upgrade with `_acme-challenge.auth.foo` TXT record with `test_value` as value.  
 
 However, these lines must be commented in `normal mode` because `$CERTBOT_DOMAIN` and `$CERTBOT_VALIDATION` variables is defined by `certbot` command.
+
+(Optional) Separate credentials
+--------
+It is recommended to store separately credentials from script to avoid a security risk.
+By default, these scripts will try to load your credentials from `secrets` file in :
+`/etc/certbot/$CERTBOT_DOMAIN/secrets`
+
+An sample of `secrets` file, named `secrets.sample`, is available to help you how it must be formated.
+
+*Similarly, you can modify default path of `secrets` file used, by editing `SECRET_FILE` variable.*
 
 Testing systems
 ----------
