@@ -81,30 +81,47 @@ log "SUBDOMAIN $SUBDOMAIN"
 # Update TXT record
 RECORD_TYPE="TXT"
 
+# Get root name server of $DOMAIN
+ROOT_NS=$(dig +short $DOMAIN ns)
+if [ $? -ne 0 ]
+then
+  log "ROOT NS DIG COMMAND HAS FAILED"
+  log "[END]"
+  exit 1
+elif [ -z "$ROOT_NS" ]
+then
+  log "ROOT_NS NOT FOUND"
+  log "[END]"
+  exit 1
+else
+  ROOT_NS=$(echo "$ROOT_NS" | tail -1)
+fi
+
+log "ROOT_NS ${ROOT_NS}"
+
 if [[ ! -z "${SUBDOMAIN// }" ]]
 then
   RECORD_NAME="_acme-challenge.$SUBDOMAIN"
   NS=$(dig +short $SUBDOMAIN.$DOMAIN ns)
+  if [ $? -ne 0 ]
+  then
+    log "SUBDOMAIN NS DIG COMMAND HAS FAILED"
+    log "[END]"
+    exit 1
+  elif [ -z "$NS" ]
+  then
+    log "NO SUBDOMAIN NS FOUND FOR $SUBDOMAIN"
+    log "USING ROOT_NS BY DEFAULT"
+    NS=${ROOT_NS}
+  else
+    NS=$(echo "$NS" | tail -1)
+  fi
 else
   RECORD_NAME="_acme-challenge"
-  NS=$(dig +short $DOMAIN ns)
+  NS=${ROOT_NS}
 fi
 
-if [ $? -ne 0 ]
-then
-  log "DIG COMMAND HAS FAILED"
-  log "[END]"
-  exit 1
-elif [ -z "$NS" ]
-then
-  log "NS NOT FOUND"
-  log "[END]"
-  exit 1
-else
-  NS=$(echo "$NS" | tail -1)
-  log "NS ${NS}"
-fi
-
+log "NS ${NS}"
 log "RECORD_NAME $RECORD_NAME"
 
 log "CERTBOT_VALIDATION $CERTBOT_VALIDATION"
