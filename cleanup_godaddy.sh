@@ -6,7 +6,7 @@
 
 LOG_DIR="/tmp"
 LOG_FILE="$LOG_DIR/cleanup.${CERTBOT_DOMAIN}.log"
-SECRET_FILE="/etc/certbot/${CERTBOT_DOMAIN}/secrets"
+SECRET_FILE="/etc/letsencrypt/.secrets"
 
 # Get your API key from https://developer.godaddy.com
 API_KEY="your_api_key_here"
