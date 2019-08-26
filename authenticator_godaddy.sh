@@ -8,7 +8,7 @@ DEFAULT_CERTBOT_VALIDATION="default_value"
 
 LOG_DIR="/tmp"
 LOG_FILE="$LOG_DIR/authenticator.$CERTBOT_DOMAIN.log"
-SECRET_FILE="/etc/certbot/${CERTBOT_DOMAIN}/secrets"
+SECRET_FILE="/etc/letsencrypt/.secrets"
 
 # Get your API key from https://developer.godaddy.com
 API_KEY="your_api_key_here"
@@ -18,7 +18,7 @@ API_SECRET="your_api_secret_here"
 # Delay between the DNS record update and the first dig request (in seconds)
 DELAY_AFTER_DNS_RECORD_UPDATE=30
 # Time interval between each dig request (in seconds)
-DIG_TIME_INTERVAL=4
+DIG_TIME_INTERVAL=15
 # Number of retries of dig request before ending in a failure
 DIG_NB_RETRIES=25
 
