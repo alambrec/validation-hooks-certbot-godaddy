@@ -69,7 +69,6 @@ else
   then
     log "SUBDOMAIN DETECTED"
     SUBDOMAIN=$(echo "$CERTBOT_DOMAIN" | sed "s/.$DOMAIN//")
-    DOMAIN=$CERTBOT_DOMAIN
   else
     DOMAIN=$CERTBOT_DOMAIN
   fi
