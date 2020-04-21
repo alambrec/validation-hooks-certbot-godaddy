@@ -2,6 +2,8 @@ validation-hooks-certbot-godaddy
 =====================================
 Pre and Post Validation Hooks DNS for manual mode of `certbot` with GoDaddy domains
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 What is it ?
 -----------
 This repository contains pre and post validation hooks to be used with `certbot` command in `manual mode` to certify a GoDaddy Domains with DNS-01 method.
